@@ -20,7 +20,7 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
     text: req.body.text,
     user_id: req.id
   }
-  
+
   Posts.insert(newPost)
     .then(post => {
       res.status(201).json(post);
@@ -84,8 +84,23 @@ router.delete('/:id', validateUserId, (req, res) => {
     })
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
+router.put('/:id', validateUserId, (req, res) => {
+  const { id } = req.params;
+  const changeUsername = {
+    name: req.body.name
+  }
+  Users.update(id, changeUsername)
+    .then(update => {
+      Users.getById(id).then(user => {
+        res.status(200).json({update, user});
+      })
+    })
+    .catch(err => {
+      console.log("Users.update by id error: ", err);
+      res.status(500).json({ success: false, message: "exception", err })
+    })
+
+
 });
 
 //custom middleware
