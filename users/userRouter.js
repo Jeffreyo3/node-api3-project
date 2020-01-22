@@ -15,8 +15,21 @@ router.post('/', validateUser, (req, res) => {
     })
 });
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  const newPost = {
+    text: req.body.text,
+    user_id: req.id
+  }
+  
+  Posts.insert(newPost)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      console.log("Insert post error: ", err);
+      res.status(500).json({ success: false, message: "exception", err })
+    })
+
 });
 
 router.get('/', (req, res) => {
@@ -46,7 +59,7 @@ router.get('/:id/posts', validateUserId, (req, res) => {
   const { id } = req.params
   Users.getUserPosts(id)
     .then(posts => {
-      if(posts.length > 0) {
+      if (posts.length > 0) {
         res.status(200).json(posts)
       } else {
         res.status(200).json(`${req.user.name} has not added any posts!`)
