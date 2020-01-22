@@ -13,27 +13,44 @@ router.post('/:id/posts', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  // do your magic!
   Users.get()
     .then(user => {
       res.status(200).json(user);
     })
     .catch(err => {
-      console.log("get post error: ", err);
+      console.log("get users error: ", err);
       res.status(500).json({ success: false, message: "exception", err })
     })
 });
 
-router.get('/:id', (req, res) => {
-  // do your magic!
+router.get('/:id', validateUserId, (req, res) => {
+  const { id } = req.params;
+  Users.getById(id)
+    .then(user => {
+      res.status(200).json(user);
+    })
+    .catch(err => {
+      console.log("Users.getById error: ", err);
+      res.status(500).json({ success: false, message: "exception", err })
+    })
 });
 
 router.get('/:id/posts', (req, res) => {
   // do your magic!
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   // do your magic!
+  const {id} = req.params;
+  Users.remove(id)
+    .then(remove => {
+      const message = `Removed ${req.user.name} from the database`;
+      res.status(200).json({remove, message})
+    })
+    .catch(err => {
+      console.log("Users.remove by id error: ", err);
+      res.status(500).json({ success: false, message: "exception", err })
+    })
 });
 
 router.put('/:id', (req, res) => {
