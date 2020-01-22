@@ -4,8 +4,15 @@ const Posts = require('../posts/postDb');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  // do your magic!
+router.post('/', validateUser, (req, res) => {
+  Users.insert(req.body)
+    .then(user => {
+      res.status(201).json(user);
+    })
+    .catch(err => {
+      console.log("Insert user error: ", err);
+      res.status(500).json({ success: false, message: "exception", err })
+    })
 });
 
 router.post('/:id/posts', (req, res) => {
@@ -40,11 +47,11 @@ router.get('/:id/posts', (req, res) => {
 });
 
 router.delete('/:id', validateUserId, (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   Users.remove(id)
     .then(remove => {
       const message = `Removed ${req.user.name} from the database`;
-      res.status(200).json({remove, message})
+      res.status(200).json({ remove, message })
     })
     .catch(err => {
       console.log("Users.remove by id error: ", err);
@@ -79,10 +86,10 @@ function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // do your magic!
-  if(!req.body) {
-    res.status(400).json({success: false, message: "missing user data"})
-  } else if(!req.body.name) {
-    res.status(400).json({success: false, message: "missing required name field"})
+  if (!req.body) {
+    res.status(400).json({ success: false, message: "missing user data" })
+  } else if (!req.body.name) {
+    res.status(400).json({ success: false, message: "missing required name field" })
   } else {
     next();
   }
