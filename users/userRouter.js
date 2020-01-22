@@ -40,7 +40,6 @@ router.get('/:id/posts', (req, res) => {
 });
 
 router.delete('/:id', validateUserId, (req, res) => {
-  // do your magic!
   const {id} = req.params;
   Users.remove(id)
     .then(remove => {
@@ -76,11 +75,18 @@ function validateUserId(req, res, next) {
       console.log("validateUserId error: ", err);
       res.status(500).json({ success: false, message: "exception", err });
     });
-}
+};
 
 function validateUser(req, res, next) {
   // do your magic!
-}
+  if(!req.body) {
+    res.status(400).json({success: false, message: "missing user data"})
+  } else if(!req.body.name) {
+    res.status(400).json({success: false, message: "missing required name field"})
+  } else {
+    next();
+  }
+};
 
 function validatePost(req, res, next) {
   // do your magic!
